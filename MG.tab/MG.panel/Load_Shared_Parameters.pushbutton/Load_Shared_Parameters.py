@@ -1,4 +1,6 @@
 #! python3
+__title__ = "Load Shared\nParameters"
+__author__ = "Mohamed Iheb Gherissi"
 
 # BOILERPLATE
 import System
