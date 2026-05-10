@@ -1,0 +1,55 @@
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Title="Load Shared Parameters" Height="500" Width="800">
+    <DockPanel>
+        <Button x:Name="btnApply" DockPanel.Dock="Bottom" Content="Applica" Margin="5" Height="30"/>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="200*"/>
+                <ColumnDefinition Width="200*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Colonna 0: File + Shared Parameters -->
+            <StackPanel Grid.Column="0" Margin="5">
+                <Label FontWeight="Bold">Shared Parameter File</Label>
+                <DockPanel Margin="0,0,0,5">
+                    <Button x:Name="btnBrowse" DockPanel.Dock="Right" Content="..." Width="30"/>
+                    <TextBox x:Name="txtFilePath" IsReadOnly="True"/>
+                </DockPanel>
+                <Label FontWeight="Bold">Shared Parameters</Label>
+                <ListBox x:Name="listParameters" Height="300"/>
+            </StackPanel>
+
+            <!-- Colonna 1: Category Types -->
+            <StackPanel Grid.Column="1" Margin="5">
+                <Label FontWeight="Bold">Category Types</Label>
+                <ListBox x:Name="listCategoryTypes" Height="350"/>
+            </StackPanel>
+
+            <!-- Colonna 2: Categories -->
+            <StackPanel Grid.Column="2" Margin="5">
+                <Label FontWeight="Bold">Categories</Label>
+                <DockPanel Margin="0,0,0,5">
+                    <Button x:Name="btnCheckAll" DockPanel.Dock="Left" Content="All" Width="50" Margin="0,0,5,0"/>
+                    <Button x:Name="btnCheckNone" DockPanel.Dock="Left" Content="None" Width="50"/>
+                </DockPanel>
+                <ListBox x:Name="listCategories" Height="320"/>
+            </StackPanel>
+
+            <!-- Colonna 3: Opzioni parametro -->
+            <StackPanel Grid.Column="3" Margin="5">
+                <Label FontWeight="Bold">Opzioni</Label>
+                <Label>Tipo binding</Label>
+                <RadioButton x:Name="rbInstance" Content="Istanza" IsChecked="True" Margin="0,2"/>
+                <RadioButton x:Name="rbType" Content="Tipo" Margin="0,2"/>
+                <CheckBox x:Name="chkVariesByGroup" Content="Varia per gruppo" Margin="0,10,0,2"/>
+                <Label>Group Under</Label>
+                <ComboBox x:Name="cmbGroupUnder" Margin="0,2"/>
+            </StackPanel>
+
+        </Grid>
+    </DockPanel>
+</Window>
