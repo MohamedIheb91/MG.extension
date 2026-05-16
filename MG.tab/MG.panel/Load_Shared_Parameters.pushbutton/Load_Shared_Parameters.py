@@ -22,12 +22,13 @@ from System.Windows import Window, LogicalTreeHelper
 from System.Windows.Markup import XamlReader
 from System.Windows.Forms import OpenFileDialog
 from System.Windows.Controls import CheckBox
+from System.Windows.Media import Brushes
 
 
 uidoc = __revit__.ActiveUIDocument
 doc = uidoc.Document # oggetto documento
 
-# Gruppi di parametri
+# Gruppi di parametri?
 ## da ispezionare meglio la possibilità di rendere questo gruppo
 ## un gruppo estraibile da revit API
 
@@ -92,14 +93,57 @@ class SharedParameterWindows(Window):
 
         list_parameters = LogicalTreeHelper.FindLogicalNode(win, "listParameters")
 
+        existing_guids = set()
+        it = doc.ParameterBindings.ForwardIterator()
+        it.Reset()
+        while it.MoveNext():
+            defn = it.Key
+            elem = doc.GetElement(defn.Id)
+            if isinstance(elem, SharedParameterElement):
+                existing_guids.add(elem.GuidValue)
+
+        # Costruisco il dizionario delle categorie già che hanno il parametro
+        existing_categories = {}
+        it2 = doc.ParameterBindings.ForwardIterator()
+        it2.Reset()
+        while it2.MoveNext():
+            defn = it2.Key
+            elem = doc.GetElement(defn.Id)
+            if isinstance(elem, SharedParameterElement):
+                binding = it2.Current
+                cat_names = set(c.Name for c in binding.Categories)
+                existing_categories[elem.GuidValue] = cat_names
+        
         def_file = doc.Application.OpenSharedParameterFile()
         if def_file is not None:
             for group in def_file.Groups:
                 for definition in group.Definitions:
                     cb_param = CheckBox()
                     cb_param.Content = definition.Name
+                    if definition.GUID in existing_guids:
+                        cb_param.Foreground = Brushes.Gray
                     list_parameters.Items.Add(cb_param)
-
+        
+        def on_param_selected(sender, args):
+            selected_cb = list_parameters.SelectedItem
+            if selected_cb is None:
+                print("nessun elemento selezionato")
+                return
+            param_name = selected_cb.Content
+            print("parametro selezionato:", param_name)
+            guid = next((d.GUID for g in def_file.Groups for d in g.Definitions if d.Name == param_name), None)
+            print("guid trovato", guid)
+            print("guid in existing_categories", guid in existing_categories)
+            if guid is None or guid not in existing_categories:
+                return
+            cats_to_check = existing_categories[guid]
+            print("categorie da spuntare", cats_to_check)
+            print("categirie nella lista:", [cb.Content for cb in list_categiries.Items])
+            for cb in list_categories.Items:
+                if cb.Content in cats_to_check:
+                    cb.IsChecked = True
+        list_parameters.SelectionChanged += on_param_selected
+                
         # Category types
         list_category_types = LogicalTreeHelper.FindLogicalNode(win, "listCategoryTypes")
         def on_type_checked(sender, args):
@@ -203,7 +247,7 @@ class SharedParameterWindows(Window):
                     binding = InstanceBinding(cat_set) if is_istance else TypeBinding(cat_set)
                     doc.ParameterBindings.Insert(definition, binding, group_id)
                 t.Commit()
-                # print("parameteri inseriti.")
+                print("parameteri inseriti con successo.")
             except Exception as e:
                 t.RollBack()
                 print("Errore:",e)

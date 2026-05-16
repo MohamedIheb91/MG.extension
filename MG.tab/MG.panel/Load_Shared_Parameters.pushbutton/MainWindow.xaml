@@ -21,6 +21,8 @@
                 </DockPanel>
                 <Label FontWeight="Bold">Shared Parameters</Label>
                 <ListBox x:Name="listParameters" Height="300"/>
+                <TextBlock Foreground="Gray" FontStyle="Italic" FontSize="11"
+                           Margin="2,6,0,0" TextWrapping="Wrap">I parametri in grigio sono già caricati nel progetto</TextBlock>
             </StackPanel>
 
             <!-- Colonna 1: Category Types -->
