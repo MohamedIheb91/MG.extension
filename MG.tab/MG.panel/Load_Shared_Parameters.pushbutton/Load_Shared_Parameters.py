@@ -28,6 +28,8 @@ uidoc = __revit__.ActiveUIDocument
 doc = uidoc.Document # oggetto documento
 
 # Gruppi di parametri
+## da ispezionare meglio la possibilità di rendere questo gruppo
+## un gruppo estraibile da revit API
 
 GRUPPI_UTILI = [
   "IdentityData", "Constraints", "Construction", "Geometry",
@@ -43,6 +45,7 @@ class Categoria:
         self.name = cat.Name
         self.type = cat.CategoryType
         self.id = cat.Id
+        self.allows_bound = cat.AllowsBoundParameters
     def __repr__(self):
         return f"{self.name} of type {self.type} and ID: {self.id}"
 
@@ -104,7 +107,7 @@ class SharedParameterWindows(Window):
             list_categories = LogicalTreeHelper.FindLogicalNode(win, "listCategories")
             list_categories.Items.Clear()
             for cat in categorie:
-                if str(cat.type) in selected_types:
+                if str(cat.type) in selected_types and cat.allows_bound:
                     cb_cat = CheckBox()
                     cb_cat.Content = cat.name
                     list_categories.Items.Add(cb_cat)
@@ -199,7 +202,7 @@ class SharedParameterWindows(Window):
                               break
                     binding = InstanceBinding(cat_set) if is_istance else TypeBinding(cat_set)
                     doc.ParameterBindings.Insert(definition, binding, group_id)
-                    t.Commit()
+                t.Commit()
                 # print("parameteri inseriti.")
             except Exception as e:
                 t.RollBack()
